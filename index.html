@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نموذج جمع البيانات</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">نموذج جمع البيانات</h1>
+        
+        <form id="userDataForm" class="needs-validation" novalidate>
+            <!-- Personal Information -->
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <label for="nin" class="form-label">الرقم التعريفي الوطني الوحيد (NIN)*</label>
+                    <input type="text" class="form-control" id="nin" name="nin" required>
+                    <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label for="nss" class="form-label">رقم الضمان الإجتماعي (NSS)*</label>
+                    <input type="text" class="form-control" id="nss" name="nss" required>
+                    <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label for="birthDate" class="form-label">تاريخ الميلاد*</label>
+                    <input type="date" class="form-control" id="birthDate" name="birthDate" required>
+                    <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label for="phone" class="form-label">رقم الهاتف*</label>
+                    <input type="tel" class="form-control" id="phone" name="phone" required>
+                    <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label for="registrationCode" class="form-label">رقم التسجيل التسلسلي*</label>
+                    <input type="text" class="form-control" id="registrationCode" name="registrationCode" required>
+                    <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                </div>
+
+                <!-- Father's Information -->
+                <div class="col-12 mb-3">
+                    <label for="fatherNameAr" class="form-label">إسم الأب*</label>
+                    <input type="text" class="form-control" id="fatherNameAr" name="fatherNameAr" required>
+                    <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label for="fatherNameFr" class="form-label">Prénom du père*</label>
+                    <input type="text" class="form-control" id="fatherNameFr" name="fatherNameFr" required>
+                    <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                </div>
+
+                <!-- Mother's Information -->
+                <div class="col-12 mb-3">
+                    <label for="motherLastNameAr" class="form-label">لقب الأم*</label>
+                    <input type="text" class="form-control" id="motherLastNameAr" name="motherLastNameAr" required>
+                    <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label for="motherLastNameFr" class="form-label">Nom de la mère*</label>
+                    <input type="text" class="form-control" id="motherLastNameFr" name="motherLastNameFr" required>
+                    <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label for="motherNameAr" class="form-label">إسم الأم*</label>
+                    <input type="text" class="form-control" id="motherNameAr" name="motherNameAr" required>
+                    <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label for="motherNameFr" class="form-label">Prénom de la mère*</label>
+                    <input type="text" class="form-control" id="motherNameFr" name="motherNameFr" required>
+                    <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                </div>
+
+                <!-- Parents' Birth Information -->
+                <div class="col-12 mb-3">
+                    <label for="fatherBirthDate" class="form-label">تاريخ ميلاد الأب*</label>
+                    <input type="date" class="form-control" id="fatherBirthDate" name="fatherBirthDate" required>
+                    <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label for="motherBirthDate" class="form-label">تاريخ ميلاد الأم*</label>
+                    <input type="date" class="form-control" id="motherBirthDate" name="motherBirthDate" required>
+                    <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label for="fatherBirthPlace" class="form-label">مكان ميلاد الأب*</label>
+                    <input type="text" class="form-control" id="fatherBirthPlace" name="fatherBirthPlace" required>
+                    <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label for="motherBirthPlace" class="form-label">مكان ميلاد الأم*</label>
+                    <input type="text" class="form-control" id="motherBirthPlace" name="motherBirthPlace" required>
+                    <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                </div>
+
+                <!-- Professional Information -->
+                <div class="col-12 mb-3">
+                    <label for="profession" class="form-label">المهنة*</label>
+                    <input type="text" class="form-control" id="profession" name="profession" required>
+                    <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label for="salary" class="form-label">الراتب (لشهر جوان 2024)*</label>
+                    <input type="number" class="form-control" id="salary" name="salary" min="0" required>
+                    <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label for="employer" class="form-label">مكان العمل*</label>
+                    <input type="text" class="form-control" id="employer" name="employer" required>
+                    <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label for="maritalStatus" class="form-label">الحالة الإجتماعية*</label>
+                    <select class="form-select" id="maritalStatus" name="maritalStatus" required>
+                        <option value="">اختر الحالة</option>
+                        <option value="single">أعزب/عزباء</option>
+                        <option value="married">متزوج/ة</option>
+                        <option value="divorced">مطلق/ة</option>
+                        <option value="widowed">أرمل/ة</option>
+                    </select>
+                    <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                </div>
+            </div>
+
+            <!-- Spouse Information Section -->
+            <div id="spouseSection" style="display: none;">
+                <h3 class="mt-4 mb-3">معلومات الزوج/ة</h3>
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label for="spouseFatherNameAr" class="form-label">إسم أب الزوج/ة*</label>
+                        <input type="text" class="form-control" id="spouseFatherNameAr" name="spouseFatherNameAr">
+                        <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label for="spouseFatherNameFr" class="form-label">Prénom du père du conjoint*</label>
+                        <input type="text" class="form-control" id="spouseFatherNameFr" name="spouseFatherNameFr">
+                        <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label for="spouseMotherLastNameAr" class="form-label">لقب أم الزوج/ة*</label>
+                        <input type="text" class="form-control" id="spouseMotherLastNameAr" name="spouseMotherLastNameAr">
+                        <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label for="spouseMotherLastNameFr" class="form-label">Nom de la mère du conjoint*</label>
+                        <input type="text" class="form-control" id="spouseMotherLastNameFr" name="spouseMotherLastNameFr">
+                        <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label for="spouseMotherNameAr" class="form-label">إسم أم الزوج/ة*</label>
+                        <input type="text" class="form-control" id="spouseMotherNameAr" name="spouseMotherNameAr">
+                        <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label for="spouseMotherNameFr" class="form-label">Prénom de la mère du conjoint*</label>
+                        <input type="text" class="form-control" id="spouseMotherNameFr" name="spouseMotherNameFr">
+                        <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label for="spouseFatherBirthDate" class="form-label">تاريخ ميلاد أب الزوج/ة*</label>
+                        <input type="date" class="form-control" id="spouseFatherBirthDate" name="spouseFatherBirthDate">
+                        <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label for="spouseMotherBirthDate" class="form-label">تاريخ ميلاد أم الزوج/ة*</label>
+                        <input type="date" class="form-control" id="spouseMotherBirthDate" name="spouseMotherBirthDate">
+                        <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label for="spouseFatherBirthPlace" class="form-label">مكان ميلاد أب الزوج/ة*</label>
+                        <input type="text" class="form-control" id="spouseFatherBirthPlace" name="spouseFatherBirthPlace">
+                        <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label for="spouseMotherBirthPlace" class="form-label">مكان ميلاد أم الزوج/ة*</label>
+                        <input type="text" class="form-control" id="spouseMotherBirthPlace" name="spouseMotherBirthPlace">
+                        <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label for="spouseProfession" class="form-label">مهنة الزوج/ة*</label>
+                        <input type="text" class="form-control" id="spouseProfession" name="spouseProfession">
+                        <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label for="spouseSalary" class="form-label">الراتب للزوج/ة (لشهر جوان 2024)*</label>
+                        <input type="number" class="form-control" id="spouseSalary" name="spouseSalary" min="0">
+                        <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label for="spouseEmployer" class="form-label">مكان العمل للزوج/ة*</label>
+                        <input type="text" class="form-control" id="spouseEmployer" name="spouseEmployer">
+                        <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">إرسال البيانات</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Firebase Scripts - Update these to the latest version -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-analytics-compat.js"></script>
+    
+    <!-- Configuration and Custom Scripts -->
+    <script src="firebase-config.js"></script>
+    <script src="script.js"></script>
+
+    <!-- Bootstrap Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
