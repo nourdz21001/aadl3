@@ -11,24 +11,61 @@ const firebaseConfig = {
 };
 
 // تهيئة Firebase
-firebase.initializeApp(firebaseConfig);
+let app;
+try {
+    app = firebase.initializeApp(firebaseConfig);
+} catch (error) {
+    if (error.code === 'app/duplicate-app') {
+        app = firebase.app();
+    } else {
+        console.error('خطأ في تهيئة Firebase:', error);
+        throw error;
+    }
+}
 
-// الحصول على مرجع قاعدة البيانات
-const db = firebase.firestore();
+// تهيئة Firestore
+const db = app.firestore();
 
 // إعدادات Firestore
 db.settings({
     timestampsInSnapshots: true,  // لمعالجة الطوابع الزمنية بشكل صحيح
     cacheSizeBytes: 5242880,      // 5MB حجم التخزين المؤقت
-    ignoreUndefinedProperties: true // تجاهل الخصائص غير المعرفة
+    ignoreUndefinedProperties: true, // تجاهل الخصائص غير المعرفة
+    merge: true // إضافة خيار الدمج
 });
 
-// تصدير كائن قاعدة البيانات للاستخدام في الملفات الأخرى
+// تهيئة Authentication
+const auth = app.auth();
+
+// إعدادات المصادقة
+auth.useDeviceLanguage();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(() => {
+        console.log('تم تعيين مستوى الاستمرارية بنجاح');
+    })
+    .catch((error) => {
+        console.error('خطأ في تعيين مستوى الاستمرارية:', error);
+    });
+
+// تصدير الكائنات للاستخدام العالمي
 window.db = db;
+window.auth = auth;
+window.firebase = firebase;
 
 // التحقق من اتصال Firebase
-db.enableNetwork().then(() => {
-    console.log('تم الاتصال بـ Firebase بنجاح');
-}).catch((error) => {
-    console.error('خطأ في الاتصال بـ Firebase:', error);
+db.enableNetwork()
+    .then(() => {
+        console.log('تم الاتصال بـ Firebase بنجاح');
+    })
+    .catch((error) => {
+        console.error('خطأ في الاتصال بـ Firebase:', error);
+    });
+
+// إضافة مستمع لحالة المصادقة
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        console.log('المستخدم مسجل الدخول:', user.email);
+    } else {
+        console.log('المستخدم غير مسجل الدخول');
+    }
 }); 
