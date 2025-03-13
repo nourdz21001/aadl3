@@ -177,36 +177,66 @@
             </div>
         </div>
 
+        <!-- Data Table -->
+        <div class="data-table">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                <input type="checkbox" class="form-check-input" id="selectAll">
+                            </th>
+                            <th>الرقم التعريفي</th>
+                            <th>الاسم</th>
+                            <th>رقم الهاتف</th>
+                            <th>الحالة</th>
+                            <th>تاريخ التسجيل</th>
+                            <th class="actions-column">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody"></tbody>
+                </table>
+            </div>
+            <div class="pagination-container d-flex justify-content-between align-items-center flex-wrap">
+                <div class="pages-info mb-2 mb-md-0">
+                    عرض <span id="currentRange">0-0</span> من <span id="totalItems">0</span>
+                </div>
+                <nav aria-label="Page navigation" class="w-100 w-md-auto">
+                    <ul class="pagination justify-content-center justify-content-md-end mb-0" id="pagination"></ul>
+                </nav>
+            </div>
+        </div>
+
         <!-- Stats Cards -->
         <div class="stats-cards">
             <div class="stat-card">
-                <h5>إجمالي السجلات</h5>
-                <h2 id="totalRecords">0</h2>
+                <h5 class="card-title h6 mb-3">إجمالي السجلات</h5>
+                <h2 class="card-value mb-0" id="totalRecords">0</h2>
             </div>
             <div class="stat-card">
-                <h5>السجلات النشطة</h5>
-                <h2 id="activeRecords">0</h2>
+                <h5 class="card-title h6 mb-3">السجلات النشطة</h5>
+                <h2 class="card-value mb-0" id="activeRecords">0</h2>
             </div>
             <div class="stat-card">
-                <h5>آخر تحديث</h5>
-                <h2 id="lastUpdate">-</h2>
+                <h5 class="card-title h6 mb-3">آخر تحديث</h5>
+                <h2 class="card-value mb-0" id="lastUpdate">-</h2>
             </div>
         </div>
 
         <!-- Search and Filters -->
         <div class="search-filters">
             <div class="row g-3">
-                <div class="col-md-4">
+                <div class="col-12 col-md-4">
                     <input type="text" class="form-control" id="searchBox" placeholder="بحث...">
                 </div>
-                <div class="col-md-3">
+                <div class="col-12 col-md-3">
                     <select class="form-select" id="statusFilter">
                         <option value="">الحالة - الكل</option>
                         <option value="active">نشط</option>
                         <option value="inactive">غير نشط</option>
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-12 col-md-3">
                     <select class="form-select" id="sortBy">
                         <option value="date_desc">الأحدث أولاً</option>
                         <option value="date_asc">الأقدم أولاً</option>
@@ -214,39 +244,11 @@
                         <option value="name_desc">الاسم (ي-أ)</option>
                     </select>
                 </div>
-                <div class="col-md-2">
+                <div class="col-12 col-md-2">
                     <button class="btn btn-secondary w-100" onclick="resetFilters()">
                         <i class="bi bi-arrow-counterclockwise"></i> إعادة تعيين
                     </button>
                 </div>
-            </div>
-        </div>
-
-        <!-- Data Table -->
-        <div class="data-table">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>
-                            <input type="checkbox" class="form-check-input" id="selectAll">
-                        </th>
-                        <th>الرقم التعريفي</th>
-                        <th>الاسم</th>
-                        <th>رقم الهاتف</th>
-                        <th>الحالة</th>
-                        <th>تاريخ التسجيل</th>
-                        <th class="actions-column">إجراءات</th>
-                    </tr>
-                </thead>
-                <tbody id="dataTableBody"></tbody>
-            </table>
-            <div class="pagination-container d-flex justify-content-between align-items-center">
-                <div class="pages-info">
-                    عرض <span id="currentRange">0-0</span> من <span id="totalItems">0</span>
-                </div>
-                <nav aria-label="Page navigation">
-                    <ul class="pagination mb-0" id="pagination"></ul>
-                </nav>
             </div>
         </div>
     </div>
