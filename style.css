@@ -8,14 +8,17 @@
 body {
     background-color: #f8f9fa;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
 }
 
 .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
     background-color: #ffffff;
-    border-radius: 10px;
+    border-radius: 15px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-    padding: 30px;
-    margin-bottom: 50px;
 }
 
 .card {
@@ -33,21 +36,23 @@ body {
 }
 
 .form-label {
+    font-size: 1.1rem;
     font-weight: 600;
     color: #2c3e50;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .form-control, .form-select {
+    font-size: 1.1rem;
+    padding: 12px 15px;
     border: 2px solid #e9ecef;
     border-radius: 8px;
-    padding: 12px;
     transition: all 0.3s ease;
 }
 
 .form-control:focus, .form-select:focus {
     border-color: #3498db;
-    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
 }
 
 .form-control.is-invalid {
@@ -61,10 +66,11 @@ body {
 }
 
 .btn-primary {
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 12px 30px;
     background-color: #3498db;
     border-color: #3498db;
-    padding: 12px 30px;
-    font-weight: 600;
     transition: all 0.3s ease;
 }
 
@@ -84,9 +90,10 @@ body {
 }
 
 .invalid-feedback {
-    font-size: 0.875rem;
+    font-size: 0.95rem;
+    font-weight: 500;
     color: #dc3545;
-    margin-top: 5px;
+    margin-top: 8px;
 }
 
 /* تنسيق خاص للحقول بالعربية */
@@ -103,7 +110,7 @@ input[name*="Fr"] {
 /* تأثيرات التحقق */
 .was-validated .form-control:invalid {
     border-color: #dc3545;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-image: none;
 }
 
 .was-validated .form-control:valid {
@@ -112,23 +119,26 @@ input[name*="Fr"] {
 }
 
 h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
     color: #2c3e50;
     margin-bottom: 30px;
-    font-weight: bold;
+    text-align: center;
 }
 
 h3 {
+    font-size: 2rem;
+    font-weight: 600;
     color: #34495e;
-    border-bottom: 2px solid #3498db;
-    padding-bottom: 10px;
-    margin-top: 20px;
+    margin: 25px 0;
 }
 
 .section {
-    margin-bottom: 40px;
-    padding: 20px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
+    background-color: #ffffff;
+    padding: 25px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 h2 {
@@ -139,7 +149,7 @@ h2 {
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 label {
@@ -181,29 +191,75 @@ input:focus, select:focus {
     background-color: #2980b9;
 }
 
-@media (max-width: 768px) {
+@media (min-width: 1200px) {
+    .container {
+        padding: 40px;
+    }
+    
+    .form-control, .form-select {
+        font-size: 1.2rem;
+        padding: 15px 20px;
+    }
+}
+
+@media (max-width: 991px) {
+    body {
+        font-size: 15px;
+    }
+    
+    h1 {
+        font-size: 2.2rem;
+    }
+    
+    h3 {
+        font-size: 1.8rem;
+    }
+    
+    .form-label {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 767px) {
+    body {
+        font-size: 14px;
+    }
+    
     .container {
         padding: 15px;
     }
     
-    input, select {
+    h1 {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+    }
+    
+    h3 {
+        font-size: 1.5rem;
+    }
+    
+    .form-control, .form-select {
+        font-size: 1rem;
+        padding: 10px 15px;
+    }
+    
+    .btn-primary {
+        font-size: 1.1rem;
+        padding: 10px 25px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
         padding: 10px;
     }
     
-    .section {
-        padding: 15px;
-    }
-
     h1 {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
     }
-
+    
     .form-label {
-        font-size: 0.9rem;
-    }
-
-    .btn-primary {
-        width: 100%;
+        font-size: 0.95rem;
     }
 }
 
@@ -225,9 +281,10 @@ body {
 /* Animation for spouse section */
 #spouseSection {
     background-color: #f8f9fa;
-    border-radius: 8px;
     padding: 20px;
-    margin-top: 20px;
+    border-radius: 10px;
+    margin-top: 30px;
+    border: 2px solid #e9ecef;
 }
 
 #spouseSection.visible {
@@ -452,4 +509,250 @@ input[type="number"] {
     background-position: left 0.75rem center;
     padding-right: 0.75rem;
     padding-left: 2.25rem;
+}
+
+/* تحسين وضوح النصوص في placeholder */
+::placeholder {
+    color: #95a5a6;
+    opacity: 0.8;
+}
+
+/* إزالة علامة النجمة (*) من الحقول المطلوبة */
+.form-label::after {
+    content: '';
+    display: none;
+}
+
+/* إخفاء رسالة "هذا الحقل مطلوب" */
+.invalid-feedback {
+    display: none !important;
+}
+
+/* تعديل مظهر الحقول غير الصالحة بدون رسالة */
+.form-control.is-invalid {
+    border-color: #dc3545;
+    background-image: none;
+}
+
+.was-validated .form-control:invalid {
+    border-color: #dc3545;
+    background-image: none;
+}
+
+/* تحسين مظهر الحقول المعطلة */
+.form-control:disabled, .form-select:disabled {
+    background-color: #e9ecef;
+    opacity: 0.8;
+}
+
+/* تحسين مظهر رسائل الخطأ */
+.invalid-feedback {
+    display: block;
+    background-color: #fff3f3;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-top: 5px;
+    border: 1px solid #dc3545;
+}
+
+/* تحسين مظهر الأزرار */
+.btn {
+    border-radius: 8px;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0.5px;
+}
+
+/* تحسين التباعد بين الحقول */
+.mb-3 {
+    margin-bottom: 1.5rem !important;
+}
+
+/* تحسين مظهر الحقول المستديرة */
+.rounded-pill {
+    border-radius: 50px !important;
+}
+
+/* تحسين حجم الخط في الحقول الكبيرة */
+.form-control-lg {
+    font-size: 1.2rem;
+    padding: 15px 25px;
+}
+
+/* تحسين التأثيرات الحركية */
+.form-control, .form-select, .btn {
+    transition: all 0.3s ease-in-out;
+}
+
+/* تحسين وضوح النصوص في الحقول */
+input, select, textarea {
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+/* تحسين مظهر النصوص التوضيحية في الحقول */
+input[name="nin"]::placeholder {
+    content: "الرقم التعريفي الوطني الوحيد ( NIN )";
+}
+
+input[name="nss"]::placeholder {
+    content: "رقم الضمان الإجتماعي ( NSS )";
+}
+
+input[name="birthDate"]::placeholder {
+    content: "تاريخ الميلاد (Date de Naissance)";
+}
+
+input[name="phone"]::placeholder {
+    content: "رقم الهاتف ( Numéro de téléphone )";
+}
+
+input[name="registrationCode"]::placeholder {
+    content: "رقم التسجيل التسلسلي ( Code )";
+}
+
+input[name="password"]::placeholder {
+    content: "كلمة المرور ( mot de passe )";
+}
+
+input[name="confirmPassword"]::placeholder {
+    content: "تأكيد كلمة المرور ( Confirmation de mot de passe )";
+}
+
+input[name="fatherNameAr"]::placeholder {
+    content: "إسم الأب";
+}
+
+input[name="fatherNameFr"]::placeholder {
+    content: "Prénom du père";
+}
+
+input[name="motherLastNameAr"]::placeholder {
+    content: "لقب الأم";
+}
+
+input[name="motherLastNameFr"]::placeholder {
+    content: "Nom de la mère";
+}
+
+input[name="motherNameAr"]::placeholder {
+    content: "إسم الأم";
+}
+
+input[name="motherNameFr"]::placeholder {
+    content: "Prénom de la mère";
+}
+
+input[name="fatherBirthDate"]::placeholder {
+    content: "تاريخ ميلاد الأب ( Date de naissance du père )";
+}
+
+input[name="motherBirthDate"]::placeholder {
+    content: "تاريخ ميلاد الأم ( Date de naissance de la mère )";
+}
+
+input[name="fatherBirthPlace"]::placeholder {
+    content: "مكان ميلاد الأب ( Lieux de naissance du père )";
+}
+
+input[name="motherBirthPlace"]::placeholder {
+    content: "مكان ميلاد الأم ( Lieux de naissance de la mère )";
+}
+
+input[name="profession"]::placeholder {
+    content: "المهنة ( Profession )";
+}
+
+input[name="salary"]::placeholder {
+    content: "الراتب ( لشهر جوان 2024) - Salaire ( du mois de Juin 2024)";
+}
+
+input[name="employer"]::placeholder {
+    content: "مكان العمل ( Employeur )";
+}
+
+/* حقول معلومات الزوج/ة */
+input[name="spouseFatherNameAr"]::placeholder {
+    content: "إسم أب الزوج/ة";
+}
+
+input[name="spouseFatherNameFr"]::placeholder {
+    content: "Prénom du père du conjoint";
+}
+
+input[name="spouseMotherLastNameAr"]::placeholder {
+    content: "لقب أم الزوج/ة";
+}
+
+input[name="spouseMotherLastNameFr"]::placeholder {
+    content: "Nom de la mère du conjoint";
+}
+
+input[name="spouseMotherNameAr"]::placeholder {
+    content: "إسم أم الزوج/ة";
+}
+
+input[name="spouseMotherNameFr"]::placeholder {
+    content: "Prénom de la mère du conjoint";
+}
+
+input[name="nin_conjoint"]::placeholder {
+    content: "الرقم التعريفي الوطني الوحيد للزوج(ة) ( NIN Conjoint )";
+}
+
+input[name="nss_conjoint"]::placeholder {
+    content: "رقم الضمان الإجتماعي للزوج(ة) ( NSS Conjoint )";
+}
+
+input[name="spouseFatherBirthDate"]::placeholder {
+    content: "تاريخ ميلاد أب الزوج/ة( Date de naissance du père du conjoint)";
+}
+
+input[name="spouseMotherBirthDate"]::placeholder {
+    content: "تاريخ ميلاد أم الزوج/ة( Date de naissance de la mère du conjoint )";
+}
+
+input[name="spouseFatherBirthPlace"]::placeholder {
+    content: "مكان ميلاد أب الزوج/ة ( Lieux de naissance du père du conjoint )";
+}
+
+input[name="spouseMotherBirthPlace"]::placeholder {
+    content: "مكان ميلاد أم الزوج/ة( Lieux de naissance de la mère du conjoint )";
+}
+
+input[name="spouseProfession"]::placeholder {
+    content: "مهنة الزوج/ة ( Profession du Conjoint )";
+}
+
+input[name="spouseSalary"]::placeholder {
+    content: "الراتب للزوج(ة) ( لشهر جوان 2024 ) - Salaire Conjoint ( du mois de Juin 2024 )";
+}
+
+input[name="spouseEmployer"]::placeholder {
+    content: "مكان العمل للزوج(ة) - Employeur Conjoint";
+}
+
+/* تحسين مظهر النصوص التوضيحية */
+::placeholder {
+    color: #95a5a6;
+    opacity: 0.8;
+    font-size: 0.95rem;
+}
+
+/* تحسين مظهر الحقول عند التركيز */
+.form-control:focus::placeholder {
+    opacity: 0.5;
+}
+
+/* تحسين مظهر الحقول */
+.form-control {
+    height: auto;
+    min-height: 45px;
+    padding: 10px 15px;
+}
+
+/* تحسين مظهر حقول التاريخ */
+input[type="date"] {
+    min-height: 45px;
+    padding: 10px 15px;
 } 
