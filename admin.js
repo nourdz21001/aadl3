@@ -1088,18 +1088,34 @@ function formatTimestamp(timestamp) {
     if (!timestamp) return 'غير محدد';
     
     try {
-        // Handle Firestore Timestamp objects
-        if (timestamp.toDate) {
-            timestamp = timestamp.toDate();
-        }
+        let date;
         
+        // Handle Firestore Timestamp objects
+        if (timestamp && typeof timestamp.toDate === 'function') {
+            date = timestamp.toDate();
+        }
         // Handle string timestamps
-        if (typeof timestamp === 'string') {
-            timestamp = new Date(timestamp);
+        else if (typeof timestamp === 'string') {
+            date = new Date(timestamp);
+        }
+        // Handle Date objects
+        else if (timestamp instanceof Date) {
+            date = timestamp;
+        }
+        // Handle numeric timestamps (milliseconds)
+        else if (typeof timestamp === 'number') {
+            date = new Date(timestamp);
+        }
+        // Handle seconds-based timestamps
+        else if (timestamp && timestamp.seconds) {
+            date = new Date(timestamp.seconds * 1000);
+        }
+        else {
+            return 'تاريخ غير صالح';
         }
 
-        // Check if timestamp is valid
-        if (isNaN(timestamp.getTime())) {
+        // Check if date is valid
+        if (isNaN(date.getTime())) {
             return 'تاريخ غير صالح';
         }
 
@@ -1113,7 +1129,7 @@ function formatTimestamp(timestamp) {
             hour12: true
         };
 
-        return new Intl.DateTimeFormat('ar-SA', options).format(timestamp);
+        return new Intl.DateTimeFormat('ar-SA', options).format(date);
     } catch (error) {
         console.error('خطأ في تنسيق التاريخ:', error);
         return 'خطأ في التاريخ';
