@@ -1568,20 +1568,11 @@ function showConfirm(message) {
 async function loadData() {
     showLoading();
     try {
-        // تحميل البيانات من مجموعة المستخدمين فقط
-        const snapshot = await db.collection('users')
-            .where('role', '!=', 'admin') // استثناء حسابات المسؤولين
-            .get();
-        
+        const snapshot = await db.collection('users').get();
         currentData = snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
-        })).filter(user => 
-            // استثناء السجلات الافتراضية والاختبارية
-            user.nin && 
-            user.nin !== 'test' && 
-            user.email !== 'admin@aadl.dz'
-        );
+        }));
         
         // تحديث الإحصائيات
         updateStats();
