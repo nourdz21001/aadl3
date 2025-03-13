@@ -836,4 +836,273 @@ input[type="date"] {
 
 .detail-item:last-child {
     border-bottom: none;
+}
+
+/* Responsive Design Improvements */
+@media (max-width: 1200px) {
+    .dashboard-container {
+        padding: 15px;
+        margin: 10px;
+    }
+
+    .stats-cards {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .form-control, .form-select {
+        font-size: 1rem;
+        padding: 8px 12px;
+    }
+}
+
+@media (max-width: 992px) {
+    .modal-dialog {
+        max-width: 90%;
+        margin: 20px auto;
+    }
+
+    .detail-section {
+        padding: 15px;
+    }
+
+    .btn-group {
+        flex-wrap: wrap;
+    }
+
+    .btn-group .btn {
+        margin: 2px;
+    }
+
+    .table th, .table td {
+        padding: 8px;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 10px;
+        margin: 5px;
+    }
+
+    .stats-cards {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .search-filters .row > div {
+        margin-bottom: 10px;
+    }
+
+    .data-table {
+        overflow-x: auto;
+    }
+
+    .table {
+        min-width: 800px; /* Ensure horizontal scrolling on small devices */
+    }
+
+    .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .modal-dialog {
+        margin: 10px;
+    }
+
+    .btn {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+    }
+
+    /* Stack buttons vertically on mobile */
+    .btn-group {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn-group .btn {
+        width: 100%;
+        margin: 2px 0;
+        border-radius: 4px !important;
+    }
+
+    /* Improve form elements on mobile */
+    .form-control, .form-select {
+        height: 40px;
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+
+    /* Adjust modal content for mobile */
+    .modal-body {
+        padding: 15px;
+    }
+
+    .modal-footer {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .modal-footer .btn {
+        width: 100%;
+    }
+
+    /* Improve table responsiveness */
+    .table-responsive {
+        margin-bottom: 15px;
+    }
+
+    /* Stack form groups vertically */
+    .row {
+        margin-right: 0;
+        margin-left: 0;
+    }
+
+    .col-md-6 {
+        padding-right: 0;
+        padding-left: 0;
+    }
+}
+
+@media (max-width: 576px) {
+    h1, .h1 {
+        font-size: 1.5rem;
+    }
+
+    h2, .h2 {
+        font-size: 1.3rem;
+    }
+
+    h3, .h3 {
+        font-size: 1.2rem;
+    }
+
+    .stat-card {
+        padding: 15px;
+    }
+
+    .stat-card h2 {
+        font-size: 1.5rem;
+    }
+
+    .detail-section {
+        padding: 10px;
+    }
+
+    .pages-info {
+        text-align: center;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .pagination-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Improve touch targets */
+    .btn, 
+    .form-control,
+    .form-select,
+    .nav-link {
+        min-height: 44px; /* Minimum touch target size */
+    }
+
+    /* Adjust spacing for better mobile viewing */
+    .mb-3 {
+        margin-bottom: 1rem !important;
+    }
+
+    .mt-4 {
+        margin-top: 1.5rem !important;
+    }
+
+    /* Improve modal usability on small screens */
+    .modal-content {
+        border-radius: 0;
+    }
+
+    .modal-header {
+        padding: 10px 15px;
+    }
+
+    .modal-body {
+        padding: 15px;
+    }
+
+    .modal-footer {
+        padding: 10px 15px;
+    }
+}
+
+/* RTL Specific Mobile Adjustments */
+@media (max-width: 768px) {
+    [dir="rtl"] .modal-header .btn-close {
+        margin: 0;
+        padding: 8px;
+    }
+
+    [dir="rtl"] .form-select {
+        background-position: left 8px center;
+        padding-right: 8px;
+        padding-left: 24px;
+    }
+}
+
+/* Print Optimization */
+@media print {
+    .dashboard-container {
+        padding: 0;
+        margin: 0;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .table {
+        width: 100% !important;
+        min-width: auto !important;
+    }
+
+    .table th,
+    .table td {
+        padding: 4px !important;
+    }
+}
+
+/* High DPI Screen Optimization */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .form-control,
+    .form-select,
+    .btn {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .table {
+        color: inherit;
+    }
+
+    .form-control,
+    .form-select {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* Landscape Mode Optimization */
+@media (max-height: 576px) and (orientation: landscape) {
+    .modal-dialog {
+        margin: 5px auto;
+    }
+
+    .modal-body {
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+    }
 } 
