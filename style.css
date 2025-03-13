@@ -755,4 +755,85 @@ input[name="spouseEmployer"]::placeholder {
 input[type="date"] {
     min-height: 45px;
     padding: 10px 15px;
+}
+
+/* تنسيق نموذج تسجيل الدخول */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    padding: 20px;
+}
+
+.login-container .card {
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+
+.login-container .card-body {
+    padding: 30px;
+}
+
+/* تنسيق شارات الحالة */
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status-pending {
+    background-color: #ffeeba;
+    color: #856404;
+}
+
+.status-confirmed {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-rejected {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* تنسيق نموذج تحديث الحالة */
+#statusUpdateModal .modal-content {
+    border-radius: 15px;
+}
+
+#statusUpdateModal .modal-header {
+    background-color: #f8f9fa;
+    border-radius: 15px 15px 0 0;
+}
+
+#statusNotes {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* تنسيق تفاصيل السجل */
+.details-grid {
+    display: grid;
+    gap: 20px;
+}
+
+.detail-group {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.detail-item {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
 } 
