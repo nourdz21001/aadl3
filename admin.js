@@ -10,15 +10,264 @@ const FIELD_KEYS = {
     NAME_AR: 'fatherNameAr',
     NAME_FR: 'fatherNameFr',
     PHONE: 'phone',
-    TIMESTAMP: 'timestamp'
+    TIMESTAMP: 'timestamp',
+    STATUS: 'status',
+    NOTES: 'notes'
 };
 
+// بيانات المسؤول
+const ADMIN_CREDENTIALS = {
+    email: 'admin@aadl.dz',
+    password: 'Admin@2024'
+};
+
+// التحقق من وجود حساب المسؤول وإنشائه إذا لم يكن موجوداً
+async function ensureAdminExists() {
+    try {
+        // Try to sign in first to check if account exists
+        try {
+            await auth.signInWithEmailAndPassword(ADMIN_CREDENTIALS.email, ADMIN_CREDENTIALS.password);
+            console.log('تم تسجيل الدخول بنجاح كمسؤول');
+            return await handleExistingAuthAccount();
+        } catch (error) {
+            // If account doesn't exist, create it
+            if (error.code === 'auth/user-not-found') {
+                const userCredential = await auth.createUserWithEmailAndPassword(
+                    ADMIN_CREDENTIALS.email,
+                    ADMIN_CREDENTIALS.password
+                );
+                console.log('تم إنشاء حساب المسؤول بنجاح');
+                return await handleExistingAuthAccount();
+            } else {
+                throw error; // Re-throw other errors
+            }
+        }
+    } catch (error) {
+        console.error('خطأ في إنشاء/تسجيل دخول المسؤول:', error);
+        if (error.code === 'auth/email-already-in-use') {
+            // If we get here, the account exists but password might be wrong
+            showError('خطأ في تسجيل الدخول: تأكد من صحة كلمة المرور');
+        } else {
+            showError(error.message || 'حدث خطأ غير متوقع');
+        }
+        return false;
+    }
+}
+
+async function handleExistingAuthAccount() {
+    try {
+        const user = auth.currentUser;
+        if (!user) {
+            throw new Error('لم يتم العثور على معلومات المستخدم');
+        }
+
+        // Check if admin document exists in Firestore
+        const adminDoc = await db.collection('users').doc(user.uid).get();
+        
+        if (!adminDoc.exists) {
+            // Create admin document if it doesn't exist
+            await db.collection('users').doc(user.uid).set({
+                email: ADMIN_CREDENTIALS.email,
+                role: 'admin',
+                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+            console.log('تم إضافة معلومات المسؤول إلى Firestore');
+        } else {
+            // Update last login
+            await db.collection('users').doc(user.uid).update({
+                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            console.log('تم تحديث آخر تسجيل دخول للمسؤول');
+        }
+        return true;
+    } catch (error) {
+        console.error('خطأ في معالجة حساب المسؤول:', error);
+        return false;
+    }
+}
+
+// تحديث دالة handleLogin
+async function handleLogin(e) {
+    e.preventDefault();
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
+    
+    try {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = 'جاري تسجيل الدخول...';
+        
+        const email = document.getElementById('adminEmail').value;
+        const password = document.getElementById('adminPassword').value;
+
+        console.log('محاولة تسجيل الدخول باستخدام:', email);
+
+        // تسجيل الدخول باستخدام Firebase Auth
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        console.log('تم تسجيل الدخول بنجاح:', user.email);
+
+        // إذا كان البريد الإلكتروني هو بريد المسؤول
+        if (email === ADMIN_CREDENTIALS.email) {
+            try {
+                // التحقق من وجود وثيقة المستخدم في Firestore
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                
+                if (!userDoc.exists) {
+                    console.log('إنشاء وثيقة المسؤول في Firestore...');
+                    // إنشاء وثيقة المستخدم في Firestore
+                    await db.collection('users').doc(user.uid).set({
+                        email: user.email,
+                        role: 'admin',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } else {
+                    console.log('تحديث وقت آخر تسجيل دخول للمسؤول...');
+                    // تحديث وقت آخر تسجيل دخول
+                    await db.collection('users').doc(user.uid).update({
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+
+                // تخزين حالة تسجيل الدخول
+                sessionStorage.setItem('adminLoggedIn', 'true');
+                location.reload();
+                return;
+            } catch (firestoreError) {
+                console.error('خطأ في التعامل مع Firestore:', firestoreError);
+                throw new Error('حدث خطأ أثناء معالجة بيانات المستخدم');
+            }
+        }
+
+        // للمستخدمين الآخرين، التحقق من دورهم
+        try {
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            
+            if (!userDoc.exists) {
+                console.log('لم يتم العثور على وثيقة المستخدم في Firestore');
+                await auth.signOut();
+                throw new Error('لم يتم العثور على بيانات المستخدم في Firestore');
+            }
+
+            const userData = userDoc.data();
+            if (userData.role !== 'admin') {
+                console.log('المستخدم ليس لديه صلاحيات المسؤول');
+                await auth.signOut();
+                throw new Error('ليس لديك صلاحية الوصول إلى لوحة التحكم');
+            }
+
+            // تحديث آخر تسجيل دخول
+            await db.collection('users').doc(user.uid).update({
+                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            sessionStorage.setItem('adminLoggedIn', 'true');
+            location.reload();
+
+        } catch (firestoreError) {
+            console.error('خطأ في التحقق من صلاحيات المستخدم:', firestoreError);
+            await auth.signOut();
+            throw new Error('حدث خطأ في التحقق من صلاحيات المستخدم');
+        }
+
+    } catch (error) {
+        console.error('خطأ في تسجيل الدخول:', error);
+        let errorMessage = 'حدث خطأ أثناء تسجيل الدخول';
+
+        switch (error.code) {
+            case 'auth/invalid-email':
+                errorMessage = 'البريد الإلكتروني غير صالح';
+                break;
+            case 'auth/user-disabled':
+                errorMessage = 'تم تعطيل هذا الحساب';
+                break;
+            case 'auth/user-not-found':
+                errorMessage = 'لم يتم العثور على المستخدم';
+                break;
+            case 'auth/wrong-password':
+                errorMessage = 'كلمة المرور غير صحيحة';
+                break;
+            case 'auth/invalid-login-credentials':
+                errorMessage = 'بيانات تسجيل الدخول غير صحيحة';
+                break;
+        }
+
+        alert(errorMessage);
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+    }
+}
+
+// تحديث دالة التهيئة
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('بدء تهيئة التطبيق...');
+    await ensureAdminExists();
+    
+    if (!isLoggedIn()) {
+        console.log('المستخدم غير مسجل الدخول، عرض نموذج تسجيل الدخول');
+        showLoginForm();
+    } else {
+        console.log('المستخدم مسجل الدخول، تهيئة لوحة التحكم');
+        initializeAdminPanel();
+    }
+});
+
+// التحقق من حالة تسجيل الدخول
+function isLoggedIn() {
+    return sessionStorage.getItem('adminLoggedIn') === 'true';
+}
+
+// عرض نموذج تسجيل الدخول
+function showLoginForm() {
+    const loginHtml = `
+        <div class="login-container">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="text-center mb-4">تسجيل الدخول للوحة التحكم</h3>
+                    <form id="loginForm" onsubmit="handleLogin(event)">
+                        <div class="mb-3">
+                            <label class="form-label">البريد الإلكتروني</label>
+                            <input type="email" class="form-control" id="adminEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">كلمة المرور</label>
+                            <input type="password" class="form-control" id="adminPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mb-3">دخول</button>
+                        <button type="button" class="btn btn-link w-100" onclick="showResetPasswordForm()">
+                            نسيت كلمة المرور؟
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    `;
+    document.querySelector('.dashboard-container').innerHTML = loginHtml;
+}
+
+// تسجيل الخروج
+async function logout() {
+    try {
+        await firebase.auth().signOut();
+        sessionStorage.removeItem('adminLoggedIn');
+        location.reload();
+    } catch (error) {
+        console.error('Error signing out:', error);
+        showError('حدث خطأ أثناء تسجيل الخروج');
+    }
+}
+
 // تهيئة لوحة التحكم
-document.addEventListener('DOMContentLoaded', async () => {
+async function initializeAdminPanel() {
     try {
         // التحقق من اتصال Firebase
         await db.enableNetwork();
         console.log('تم الاتصال بـ Firebase بنجاح');
+        
+        // إنشاء هيكل واجهة المستخدم
+        createAdminInterface();
         
         // تهيئة المكونات
         initializeEventListeners();
@@ -30,7 +279,102 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('خطأ في تهيئة التطبيق:', error);
         showError('حدث خطأ في تهيئة التطبيق');
     }
-});
+}
+
+// إنشاء واجهة المستخدم
+function createAdminInterface() {
+    const container = document.querySelector('.dashboard-container');
+    container.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3">لوحة التحكم - إدارة البيانات</h1>
+            <div class="btn-group">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exportModal">
+                    <i class="bi bi-download"></i> تصدير
+                </button>
+                <button class="btn btn-danger" onclick="deleteSelected()">
+                    <i class="bi bi-trash"></i> حذف المحدد
+                </button>
+                <button class="btn btn-secondary" onclick="logout()">
+                    <i class="bi bi-box-arrow-right"></i> تسجيل الخروج
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-cards">
+            <div class="stat-card">
+                <h5>إجمالي السجلات</h5>
+                <h2 id="totalRecords">0</h2>
+            </div>
+            <div class="stat-card">
+                <h5>السجلات النشطة</h5>
+                <h2 id="activeRecords">0</h2>
+            </div>
+            <div class="stat-card">
+                <h5>آخر تحديث</h5>
+                <h2 id="lastUpdate">-</h2>
+            </div>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="search-filters">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" class="form-control" id="searchBox" placeholder="بحث...">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="statusFilter">
+                        <option value="">الحالة - الكل</option>
+                        <option value="pending">في انتظار التأكيد</option>
+                        <option value="confirmed">مؤكد</option>
+                        <option value="rejected">مرفوض</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="sortBy">
+                        <option value="date_desc">الأحدث أولاً</option>
+                        <option value="date_asc">الأقدم أولاً</option>
+                        <option value="name_asc">الاسم (أ-ي)</option>
+                        <option value="name_desc">الاسم (ي-أ)</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-secondary w-100" onclick="resetFilters()">
+                        <i class="bi bi-arrow-counterclockwise"></i> إعادة تعيين
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="data-table">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" class="form-check-input" id="selectAll">
+                        </th>
+                        <th>الرقم التعريفي</th>
+                        <th>الاسم</th>
+                        <th>رقم الهاتف</th>
+                        <th>حالة التسجيل</th>
+                        <th>تاريخ التسجيل</th>
+                        <th>إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody"></tbody>
+            </table>
+            <div class="pagination-container d-flex justify-content-between align-items-center">
+                <div class="pages-info">
+                    عرض <span id="currentRange">0-0</span> من <span id="totalItems">0</span>
+                </div>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination mb-0" id="pagination"></ul>
+                </nav>
+            </div>
+        </div>
+    `;
+}
 
 // إعداد الميزات المتقدمة
 function setupAdvancedFeatures() {
@@ -658,30 +1002,42 @@ function displayData() {
     const endIndex = startIndex + itemsPerPage;
     const pageData = filteredData.slice(startIndex, endIndex);
 
+    if (pageData.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center">لا توجد بيانات للعرض</td>
+            </tr>
+        `;
+        return;
+    }
+
     pageData.forEach(entry => {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>
-                <input type="checkbox" class="form-check-input" data-id="${entry.id}">
+                <input type="checkbox" class="form-check-input" data-id="${entry.id || ''}">
             </td>
-            <td>${entry[FIELD_KEYS.NIN] || '-'}</td>
+            <td>${entry.nin || '-'}</td>
             <td>
-                <div>${entry[FIELD_KEYS.NAME_AR] || '-'}</div>
-                <small class="text-muted">${entry[FIELD_KEYS.NAME_FR] || '-'}</small>
+                <div>${entry.fatherNameAr || '-'}</div>
+                <small class="text-muted">${entry.fatherNameFr || '-'}</small>
             </td>
-            <td>${entry[FIELD_KEYS.PHONE] || '-'}</td>
+            <td>${entry.phone || '-'}</td>
             <td>
-                <span class="status-badge ${entry.status === 'active' ? 'status-active' : 'status-inactive'}">
-                    ${entry.status === 'active' ? 'نشط' : 'غير نشط'}
+                <span class="status-badge ${getStatusClass(entry.status)}">
+                    ${getStatusText(entry.status)}
                 </span>
             </td>
-            <td>${new Date(entry.timestamp).toLocaleString('ar-SA')}</td>
+            <td>${formatTimestamp(entry.timestamp)}</td>
             <td>
                 <div class="btn-group btn-group-sm">
-                    <button class="btn btn-primary" onclick='showDetails(${JSON.stringify(entry)})'>
+                    <button class="btn btn-primary" onclick='showDetails(${JSON.stringify(entry)})' title="عرض التفاصيل">
                         <i class="bi bi-eye"></i>
                     </button>
-                    <button class="btn btn-danger" onclick='deleteRecord("${entry.id}")'>
+                    <button class="btn btn-warning" onclick='showEditForm(${JSON.stringify(entry)})' title="تعديل">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-danger" onclick='deleteRecord("${entry.id}")' title="حذف">
                         <i class="bi bi-trash"></i>
                     </button>
                 </div>
@@ -692,6 +1048,76 @@ function displayData() {
 
     updatePagination();
     updateSelectedCount();
+    updateStats();
+}
+
+// دالة تنسيق حالة السجل
+function getStatusClass(status) {
+    switch (status) {
+        case 'active':
+            return 'status-active';
+        case 'pending':
+            return 'status-pending';
+        case 'confirmed':
+            return 'status-confirmed';
+        case 'rejected':
+            return 'status-rejected';
+        default:
+            return 'status-inactive';
+    }
+}
+
+// دالة تحويل حالة السجل إلى نص
+function getStatusText(status) {
+    switch (status) {
+        case 'active':
+            return 'نشط';
+        case 'pending':
+            return 'قيد الانتظار';
+        case 'confirmed':
+            return 'مؤكد';
+        case 'rejected':
+            return 'مرفوض';
+        default:
+            return 'غير نشط';
+    }
+}
+
+// دالة تنسيق التاريخ والوقت
+function formatTimestamp(timestamp) {
+    if (!timestamp) return 'غير محدد';
+    
+    try {
+        // Handle Firestore Timestamp objects
+        if (timestamp.toDate) {
+            timestamp = timestamp.toDate();
+        }
+        
+        // Handle string timestamps
+        if (typeof timestamp === 'string') {
+            timestamp = new Date(timestamp);
+        }
+
+        // Check if timestamp is valid
+        if (isNaN(timestamp.getTime())) {
+            return 'تاريخ غير صالح';
+        }
+
+        // Format the date in Arabic
+        const options = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        };
+
+        return new Intl.DateTimeFormat('ar-SA', options).format(timestamp);
+    } catch (error) {
+        console.error('خطأ في تنسيق التاريخ:', error);
+        return 'خطأ في التاريخ';
+    }
 }
 
 // تحديث التصفح
@@ -839,88 +1265,260 @@ function hideLoading() {
 // عرض التفاصيل في النموذج
 function showDetails(data) {
     const detailsContent = document.getElementById('detailsContent');
-    detailsContent.innerHTML = '';
+    if (!detailsContent) return;
 
-    // Group data by category
-    const groups = {
-        'معلومات شخصية': [
-            'الرقم التعريفي الوطني الوحيد (NIN)',
-            'رقم الضمان الإجتماعي (NSS)',
-            'رقم الهاتف',
-            'تاريخ الميلاد'
-        ],
-        'معلومات الأب': [
-            'إسم الأب بالعربية',
-            'إسم الأب بالفرنسية',
-            'تاريخ ميلاد الأب',
-            'مكان ميلاد الأب'
-        ],
-        'معلومات الأم': [
-            'إسم الأم بالعربية',
-            'إسم الأم بالفرنسية',
-            'لقب الأم بالعربية',
-            'لقب الأم بالفرنسية',
-            'تاريخ ميلاد الأم',
-            'مكان ميلاد الأم'
-        ],
-        'معلومات مهنية': [
-            'المهنة',
-            'الراتب',
-            'مكان العمل'
-        ]
-    };
-
-    const icons = {
-        'معلومات شخصية': 'bi-person',
-        'معلومات الأب': 'bi-person-fill',
-        'معلومات الأم': 'bi-person-heart',
-        'معلومات مهنية': 'bi-briefcase'
-    };
-
-    for (const [groupName, fields] of Object.entries(groups)) {
-        const groupDiv = document.createElement('div');
-        groupDiv.className = 'detail-group';
-        
-        let hasData = false;
-        let groupContent = `
-            <h4 class="mb-3">
-                <i class="bi ${icons[groupName]}"></i> ${groupName}
-            </h4>
-        `;
-
-        fields.forEach(field => {
-            if (data[field]) {
-                hasData = true;
-                groupContent += `
-                    <div class="detail-item">
-                        <div class="fw-bold text-muted">${field}</div>
-                        <div>${data[field]}</div>
+    let content = `
+        <div class="details-container">
+            <div class="detail-section">
+                <h4 class="section-title mb-3">المعلومات الشخصية</h4>
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <strong>الرقم التعريفي الوطني:</strong>
+                        <div>${data.nin || '-'}</div>
                     </div>
-                `;
-            }
-        });
+                    <div class="col-md-6 mb-2">
+                        <strong>رقم الضمان الإجتماعي:</strong>
+                        <div>${data.nss || '-'}</div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <strong>رقم الهاتف:</strong>
+                        <div>${data.phone || '-'}</div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <strong>تاريخ الميلاد:</strong>
+                        <div>${formatDate(data.birthDate) || '-'}</div>
+                    </div>
+                </div>
+            </div>
 
-        if (hasData) {
-            groupDiv.innerHTML = groupContent;
-            detailsContent.appendChild(groupDiv);
-        }
-    }
+            <div class="detail-section mt-4">
+                <h4 class="section-title mb-3">معلومات الأب</h4>
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <strong>إسم الأب بالعربية:</strong>
+                        <div>${data.fatherNameAr || '-'}</div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <strong>إسم الأب بالفرنسية:</strong>
+                        <div>${data.fatherNameFr || '-'}</div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <strong>تاريخ ميلاد الأب:</strong>
+                        <div>${formatDate(data.fatherBirthDate) || '-'}</div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <strong>مكان ميلاد الأب:</strong>
+                        <div>${data.fatherBirthPlace || '-'}</div>
+                    </div>
+                </div>
+            </div>
 
+            <div class="detail-section mt-4">
+                <h4 class="section-title mb-3">معلومات الأم</h4>
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <strong>إسم الأم بالعربية:</strong>
+                        <div>${data.motherNameAr || '-'}</div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <strong>إسم الأم بالفرنسية:</strong>
+                        <div>${data.motherNameFr || '-'}</div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <strong>لقب الأم بالعربية:</strong>
+                        <div>${data.motherLastNameAr || '-'}</div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <strong>لقب الأم بالفرنسية:</strong>
+                        <div>${data.motherLastNameFr || '-'}</div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <strong>تاريخ ميلاد الأم:</strong>
+                        <div>${formatDate(data.motherBirthDate) || '-'}</div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <strong>مكان ميلاد الأم:</strong>
+                        <div>${data.motherBirthPlace || '-'}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section mt-4">
+                <h4 class="section-title mb-3">المعلومات المهنية</h4>
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <strong>المهنة:</strong>
+                        <div>${data.profession || '-'}</div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <strong>الراتب:</strong>
+                        <div>${data.salary || '0'} دج</div>
+                    </div>
+                    <div class="col-md-12 mb-2">
+                        <strong>مكان العمل:</strong>
+                        <div>${data.employer || '-'}</div>
+                    </div>
+                </div>
+            </div>
+
+            ${data.maritalStatus === 'married' || data.maritalStatus === 'widowed' ? `
+                <div class="detail-section mt-4">
+                    <h4 class="section-title mb-3">معلومات الزوج/ة</h4>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <strong>الرقم التعريفي للزوج/ة:</strong>
+                            <div>${data.nin_conjoint || '-'}</div>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <strong>رقم الضمان الإجتماعي للزوج/ة:</strong>
+                            <div>${data.nss_conjoint || '-'}</div>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <strong>مهنة الزوج/ة:</strong>
+                            <div>${data.spouseProfession || '-'}</div>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <strong>راتب الزوج/ة:</strong>
+                            <div>${data.spouseSalary || '0'} دج</div>
+                        </div>
+                        <div class="col-md-12 mb-2">
+                            <strong>مكان عمل الزوج/ة:</strong>
+                            <div>${data.spouseEmployer || '-'}</div>
+                        </div>
+                    </div>
+                </div>
+            ` : ''}
+
+            <div class="detail-section mt-4">
+                <h4 class="section-title mb-3">معلومات النظام</h4>
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <strong>حالة التسجيل:</strong>
+                        <div>
+                            <span class="status-badge ${getStatusClass(data.status)}">
+                                ${getStatusText(data.status)}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <strong>تاريخ التسجيل:</strong>
+                        <div>${formatTimestamp(data.timestamp)}</div>
+                    </div>
+                    <div class="col-md-12 mb-2">
+                        <strong>ملاحظات:</strong>
+                        <div>${data.notes || 'لا توجد ملاحظات'}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    detailsContent.innerHTML = content;
     const modal = new bootstrap.Modal(document.getElementById('detailsModal'));
     modal.show();
+}
+
+// عرض نموذج التعديل
+function showEditForm(data) {
+    const editModal = document.createElement('div');
+    editModal.className = 'modal fade';
+    editModal.id = 'editModal';
+    editModal.innerHTML = `
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">تعديل البيانات</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm">
+                        <input type="hidden" id="editId" value="${data.id}">
+                        <div class="mb-3">
+                            <label class="form-label">الرقم التعريفي الوطني (NIN)</label>
+                            <input type="text" class="form-control" id="editNin" value="${data.nin}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">رقم الضمان الإجتماعي (NSS)</label>
+                            <input type="text" class="form-control" id="editNss" value="${data.nss}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">رقم الهاتف</label>
+                            <input type="tel" class="form-control" id="editPhone" value="${data.phone}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">الحالة</label>
+                            <select class="form-select" id="editStatus">
+                                <option value="pending" ${data.status === 'pending' ? 'selected' : ''}>قيد الانتظار</option>
+                                <option value="confirmed" ${data.status === 'confirmed' ? 'selected' : ''}>مؤكد</option>
+                                <option value="rejected" ${data.status === 'rejected' ? 'selected' : ''}>مرفوض</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">ملاحظات</label>
+                            <textarea class="form-control" id="editNotes" rows="3">${data.notes || ''}</textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-primary" onclick="saveEdit()">حفظ التغييرات</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(editModal);
+    new bootstrap.Modal(editModal).show();
+}
+
+// حفظ التعديلات
+async function saveEdit() {
+    try {
+        showLoading();
+        const id = document.getElementById('editId').value;
+        const updatedData = {
+            nin: document.getElementById('editNin').value,
+            nss: document.getElementById('editNss').value,
+            phone: document.getElementById('editPhone').value,
+            status: document.getElementById('editStatus').value,
+            notes: document.getElementById('editNotes').value,
+            lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        // التحقق من صحة البيانات
+        if (!updatedData.nin || !updatedData.nss || !updatedData.phone) {
+            throw new Error('جميع الحقول الإلزامية مطلوبة');
+        }
+
+        // تحديث البيانات في Firebase
+        await db.collection('users').doc(id).update(updatedData);
+
+        // إغلاق النموذج وتحديث العرض
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+        modal.hide();
+        document.getElementById('editModal').remove();
+
+        // تحديث البيانات في الواجهة
+        await loadData();
+        showSuccess('تم تحديث البيانات بنجاح');
+    } catch (error) {
+        console.error('Error updating document:', error);
+        showError(error.message || 'حدث خطأ أثناء تحديث البيانات');
+    } finally {
+        hideLoading();
+    }
 }
 
 // حذف السجل
 async function deleteRecord(id) {
     if (await showConfirm('هل أنت متأكد من حذف هذا السجل؟')) {
-        showLoading();
         try {
+            showLoading();
             await db.collection('users').doc(id).delete();
+            await loadData();
             showSuccess('تم حذف السجل بنجاح');
-            loadData();
         } catch (error) {
-            console.error('Error:', error);
-            showError('حدث خطأ أثناء الحذف');
+            console.error('Error deleting document:', error);
+            showError('حدث خطأ أثناء حذف السجل');
         } finally {
             hideLoading();
         }
@@ -1027,4 +1625,169 @@ function resetFilters() {
     if (sortBy) sortBy.value = 'date_desc';
 
     applyFiltersAndSort();
+}
+
+// عرض نموذج تحديث الحالة
+function showStatusUpdateForm(id, currentStatus, currentNotes) {
+    const modalHtml = `
+        <div class="modal fade" id="statusUpdateModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">تحديث حالة التسجيل</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">الحالة</label>
+                            <select class="form-select" id="statusSelect">
+                                <option value="pending" ${currentStatus === 'pending' ? 'selected' : ''}>في انتظار التأكيد</option>
+                                <option value="confirmed" ${currentStatus === 'confirmed' ? 'selected' : ''}>مؤكد</option>
+                                <option value="rejected" ${currentStatus === 'rejected' ? 'selected' : ''}>مرفوض</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">ملاحظات</label>
+                            <textarea class="form-control" id="statusNotes" rows="3">${currentNotes || ''}</textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                        <button type="button" class="btn btn-primary" onclick="saveStatusUpdate('${id}')">حفظ التغييرات</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    const modal = new bootstrap.Modal(document.getElementById('statusUpdateModal'));
+    modal.show();
+    
+    // إزالة النموذج بعد الإغلاق
+    document.getElementById('statusUpdateModal').addEventListener('hidden.bs.modal', function () {
+        this.remove();
+    });
+}
+
+// حفظ تحديث الحالة
+function saveStatusUpdate(id) {
+    const status = document.getElementById('statusSelect').value;
+    const notes = document.getElementById('statusNotes').value;
+    updateRegistrationStatus(id, status, notes);
+    bootstrap.Modal.getInstance(document.getElementById('statusUpdateModal')).hide();
+}
+
+// تحديث حالة التسجيل
+async function updateRegistrationStatus(id, status, notes) {
+    try {
+        await db.collection('users').doc(id).update({
+            status: status,
+            notes: notes || ''
+        });
+        showSuccess('تم تحديث حالة التسجيل بنجاح');
+        loadData();
+    } catch (error) {
+        showError('حدث خطأ أثناء تحديث حالة التسجيل');
+        console.error(error);
+    }
+}
+
+// دالة إنشاء حساب مستخدم جديد
+async function createUserAccount(email, password) {
+    try {
+        showLoading();
+        // إنشاء حساب المستخدم
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        // إضافة معلومات المستخدم إلى Firestore
+        await db.collection('users').doc(user.uid).set({
+            email: email,
+            role: 'user',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        showSuccess('تم إنشاء الحساب بنجاح');
+        return user;
+    } catch (error) {
+        console.error('Error creating user:', error);
+        let errorMessage = 'حدث خطأ أثناء إنشاء الحساب';
+        
+        switch (error.code) {
+            case 'auth/email-already-in-use':
+                errorMessage = 'البريد الإلكتروني مستخدم بالفعل';
+                break;
+            case 'auth/invalid-email':
+                errorMessage = 'البريد الإلكتروني غير صالح';
+                break;
+            case 'auth/operation-not-allowed':
+                errorMessage = 'تسجيل المستخدمين غير مفعل';
+                break;
+            case 'auth/weak-password':
+                errorMessage = 'كلمة المرور ضعيفة جداً';
+                break;
+        }
+        
+        showError(errorMessage);
+        throw error;
+    } finally {
+        hideLoading();
+    }
+}
+
+// دالة عرض نموذج إعادة تعيين كلمة المرور
+function showResetPasswordForm() {
+    const resetHtml = `
+        <div class="login-container">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="text-center mb-4">إعادة تعيين كلمة المرور</h3>
+                    <form id="resetForm" onsubmit="handleResetPassword(event)">
+                        <div class="mb-3">
+                            <label class="form-label">البريد الإلكتروني</label>
+                            <input type="email" class="form-control" id="resetEmail" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mb-3">إرسال رابط إعادة التعيين</button>
+                        <button type="button" class="btn btn-link w-100" onclick="showLoginForm()">
+                            العودة لتسجيل الدخول
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    `;
+    document.querySelector('.dashboard-container').innerHTML = resetHtml;
+}
+
+// دالة معالجة طلب إعادة تعيين كلمة المرور
+function handleResetPassword(e) {
+    e.preventDefault();
+    const email = document.getElementById('resetEmail').value;
+    resetPassword(email);
+}
+
+// دالة إعادة تعيين كلمة المرور
+async function resetPassword(email) {
+    try {
+        showLoading();
+        await auth.sendPasswordResetEmail(email);
+        showSuccess('تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني');
+    } catch (error) {
+        console.error('Error resetting password:', error);
+        let errorMessage = 'حدث خطأ أثناء إعادة تعيين كلمة المرور';
+        
+        switch (error.code) {
+            case 'auth/invalid-email':
+                errorMessage = 'البريد الإلكتروني غير صالح';
+                break;
+            case 'auth/user-not-found':
+                errorMessage = 'لم يتم العثور على المستخدم';
+                break;
+        }
+        
+        showError(errorMessage);
+    } finally {
+        hideLoading();
+    }
 } 
