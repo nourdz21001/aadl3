@@ -180,6 +180,30 @@
                     </div>
 
                     <div class="col-12 mb-3">
+                        <label for="nin_conjoint" class="form-label">الرقم التعريفي الوطني الوحيد للزوج(ة) ( NIN Conjoint )*</label>
+                        <input type="text" class="form-control form-control-lg rounded-pill" name="nin_conjoint" id="nin_conjoint" 
+                            placeholder="ادخل الرقم التعريفي الوطني الوحيد للزوج(ة) هنا ( Entrez le NIN du conjoint )" 
+                            pattern="^\d{18}$" 
+                            title="Le NIN doit contenir exactement 18 chiffres." 
+                            maxlength="18" 
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 18);" 
+                            required>
+                        <div class="invalid-feedback">يجب أن يحتوي الرقم التعريفي على 18 رقماً بالضبط</div>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label for="nss_conjoint" class="form-label">رقم الضمان الإجتماعي للزوج(ة) ( NSS Conjoint )*</label>
+                        <input type="text" class="form-control form-control-lg rounded-pill" name="nss_conjoint" id="nss_conjoint"
+                            placeholder="ادخل رقم الضمان الاجتماعي للزوج(ة) هنا ( Entrez le NSS du conjoint )"
+                            maxlength="13" 
+                            pattern="\d{4,13}" 
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 13);" 
+                            title="يجب أن يحتوي رقم الضمان الإجتماعي على 4 إلى 13 رقمًا فقط"
+                            required>
+                        <div class="invalid-feedback">يجب أن يحتوي رقم الضمان الإجتماعي على 4 إلى 13 رقمًا</div>
+                    </div>
+
+                    <div class="col-12 mb-3">
                         <label for="spouseFatherBirthDate" class="form-label">تاريخ ميلاد أب الزوج/ة*</label>
                         <input type="date" class="form-control" id="spouseFatherBirthDate" name="spouseFatherBirthDate">
                         <div class="invalid-feedback">هذا الحقل مطلوب</div>
