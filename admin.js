@@ -1430,7 +1430,35 @@ function showDetails(data) {
     `;
 
     detailsContent.innerHTML = content;
-    const modal = new bootstrap.Modal(document.getElementById('detailsModal'));
+    
+    // Get the modal element
+    const modalElement = document.getElementById('detailsModal');
+    
+    // Store the element that had focus before opening the modal
+    const previousActiveElement = document.activeElement;
+    
+    // Initialize the modal
+    const modal = new bootstrap.Modal(modalElement);
+    
+    // Add event listeners for accessibility
+    modalElement.addEventListener('shown.bs.modal', function () {
+        // Find the first focusable element in the modal
+        const closeButton = modalElement.querySelector('.btn-close');
+        if (closeButton) {
+            closeButton.focus();
+        }
+    });
+
+    modalElement.addEventListener('hidden.bs.modal', function () {
+        // Remove aria-hidden when the modal is closed
+        modalElement.removeAttribute('aria-hidden');
+        // Return focus to the element that had focus before opening the modal
+        if (previousActiveElement) {
+            previousActiveElement.focus();
+        }
+    });
+
+    // Show the modal
     modal.show();
 }
 
