@@ -481,8 +481,16 @@ async function exportData() {
             break;
     }
 
-    const exportModal = bootstrap.Modal.getInstance(document.getElementById('exportModal'));
-    exportModal.hide();
+    const exportModal = document.getElementById('exportModal');
+    const modal = bootstrap.Modal.getInstance(exportModal);
+    
+    modal.hide();
+    
+    // إعادة التركيز إلى زر التصدير الرئيسي
+    const exportButton = document.querySelector('[data-bs-target="#exportModal"]');
+    if (exportButton) {
+        exportButton.focus();
+    }
 }
 
 // تصدير إلى Excel
@@ -685,183 +693,77 @@ function exportToPDF(data) {
 // تصدير إلى TXT
 function exportToTXT(data) {
     let content = '';
-
+    
+    // تصدير كل سجل
     data.forEach((item, index) => {
-        if (index > 0) {
-            content += '\n\n----------------------------------------\n\n';
-        }
-
-        // المعلومات الشخصية
+        content += `=== بيانات المستخدم ${index + 1} ===\n\n`;
+        
+        // البيانات الشخصية
         content += `الرقم التعريفي الوطني الوحيد ( NIN ) : ${item.nin || ''}\n`;
         content += `رقم الضمان الإجتماعي ( NSS ) : ${item.nss || ''}\n`;
-        content += `تاريخ الميلاد (Date de Naissance) : ${formatDate(item.birthDate)}\n`;
+        content += `تاريخ الميلاد (Date de Naissance) : ${item.birthDate || ''}\n`;
         content += `رقم الهاتف ( Numéro de téléphone ) : ${item.phone || ''}\n`;
-        content += `رقم التسجيل التسلسلي ( Code ): ${item.registrationCode || ''}\n`;
-        content += `كلمة المرور ( mot de passe ) : a0000@AA\n`;
-        content += `تأكيد كلمة المرور ( Confirmation de mot de passe ) : a0000@AA\n`;
+        content += `رقم التسجيل التسلسلي ( Code ): ${item.registrationCode || ''}\n\n`;
 
         // معلومات الأب
         content += `إسم الأب : ${item.fatherNameAr || ''}\n`;
         content += `Prénom du père : ${item.fatherNameFr || ''}\n`;
+        content += `تاريخ ميلاد الأب ( Date de naissance du père ) : ${item.fatherBirthDate || ''}\n`;
+        content += `مكان ميلاد الأب ( Lieux de naissance du père ) : ${item.fatherBirthPlace || ''}\n\n`;
 
         // معلومات الأم
         content += `لقب الأم : ${item.motherLastNameAr || ''}\n`;
         content += `Nom de la mère : ${item.motherLastNameFr || ''}\n`;
         content += `إسم الأم : ${item.motherNameAr || ''}\n`;
         content += `Prénom de la mère : ${item.motherNameFr || ''}\n`;
+        content += `تاريخ ميلاد الأم ( Date de naissance de la mère ) : ${item.motherBirthDate || ''}\n`;
+        content += `مكان ميلاد الأم ( Lieux de naissance de la mère ) : ${item.motherBirthPlace || ''}\n\n`;
 
-        // تواريخ ميلاد الوالدين
-        content += `تاريخ ميلاد الأب ( Date de naissance du père ) : ${formatDate(item.fatherBirthDate)}\n`;
-        content += `تاريخ ميلاد الأم ( Date de naissance de la mère ) : ${formatDate(item.motherBirthDate)}\n`;
-
-        // أماكن ميلاد الوالدين
-        content += `مكان ميلاد الأب ( Lieux de naissance du père ) : ${item.fatherBirthPlace || ''}\n`;
-        content += `مكان ميلاد الأم ( Lieux de naissance de la mère ) : ${item.motherBirthPlace || ''}\n`;
-
-        // معلومات مهنية
+        // معلومات العمل
         content += `المهنة ( Profession ) : ${item.profession || ''}\n`;
-        content += `الراتب ( لشهر جوان 2024) - Salaire ( du mois de Juin 2024) : ${item.salary || '0'}\n`;
-        content += `مكان العمل ( Employeur ) : ${item.employer || ''}\n`;
+        content += `الراتب ( لشهر جوان 2024) - Salaire ( du mois de Juin 2024) : ${item.salary || ''}\n`;
+        content += `مكان العمل ( Employeur ) : ${item.employer || ''}\n\n`;
 
-        // معلومات الزوج/ة إذا كانت موجودة
+        // معلومات الزوج/ة (إذا كانت موجودة)
         if (item.maritalStatus === 'married' || item.maritalStatus === 'widowed') {
+            content += `=== معلومات الزوج/ة ===\n\n`;
+            content += `الرقم التعريفي الوطني الوحيد للزوج(ة) ( NIN Conjoint ) : ${item.nin_conjoint || ''}\n`;
+            content += `رقم الضمان الإجتماعي للزوج(ة) ( NSS Conjoint ) : ${item.nss_conjoint || ''}\n`;
+            content += `تاريخ ميلاد الزوج/ة ( Date de naissance Conjoint ) : ${item.date_nais_conjoint || ''}\n`;
+            content += `لقب الزوج/ة ( Nom du conjoint ) : ${item.nom_conjoint || ''}\n`;
+            content += `إسم الزوج/ة ( Prénom du conjoint ) : ${item.prenom_conjoint || ''}\n`;
             content += `إسم أب الزوج/ة : ${item.spouseFatherNameAr || ''}\n`;
             content += `Prénom du père du conjoint : ${item.spouseFatherNameFr || ''}\n`;
             content += `لقب أم الزوج/ة : ${item.spouseMotherLastNameAr || ''}\n`;
             content += `Nom de la mère du conjoint : ${item.spouseMotherLastNameFr || ''}\n`;
             content += `إسم أم الزوج/ة : ${item.spouseMotherNameAr || ''}\n`;
             content += `Prénom de la mère du conjoint : ${item.spouseMotherNameFr || ''}\n`;
-            content += `تاريخ ميلاد أب الزوج/ة( Date de naissance du père du conjoint) : ${formatDate(item.spouseFatherBirthDate)}\n`;
-            content += `تاريخ ميلاد أم الزوج/ة( Date de naissance de la mère du conjoint ) : ${formatDate(item.spouseMotherBirthDate)}\n`;
+            content += `تاريخ ميلاد أب الزوج/ة( Date de naissance du père du conjoint) : ${item.spouseFatherBirthDate || ''}\n`;
+            content += `تاريخ ميلاد أم الزوج/ة( Date de naissance de la mère du conjoint ) : ${item.spouseMotherBirthDate || ''}\n`;
             content += `مكان ميلاد أب الزوج/ة ( Lieux de naissance du père du conjoint ) : ${item.spouseFatherBirthPlace || ''}\n`;
             content += `مكان ميلاد أم الزوج/ة( Lieux de naissance de la mère du conjoint ) : ${item.spouseMotherBirthPlace || ''}\n`;
-            content += `مهنة الزوج/ة ( Profession du Conjoint ) : ${item.spouseProfession || 'لا توجد'}\n`;
-            content += `الراتب للزوج(ة) ( لشهر جوان 2024 ) - Salaire Conjoint ( du mois de Juin 2024 ) : ${item.spouseSalary || '0'}\n`;
-            content += `مكان العمل للزوج(ة) - Employeur Conjoint : ${item.spouseEmployer || 'لايوجد'}`;
+            content += `مهنة الزوج/ة ( Profession du Conjoint ) : ${item.spouseProfession || ''}\n`;
+            content += `الراتب للزوج(ة) ( لشهر جوان 2024 ) - Salaire Conjoint ( du mois de Juin 2024 ) : ${item.spouseSalary || ''}\n`;
+            content += `مكان العمل للزوج(ة) - Employeur Conjoint : ${item.spouseEmployer || ''}\n`;
         }
+
+        content += '\n===========================================\n\n';
     });
 
+    // إنشاء وتنزيل الملف
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `بيانات_المستخدم_${new Date().toISOString()}.txt`;
-    link.click();
-}
-
-// دالة تنسيق التاريخ
-function formatDate(dateString) {
-    if (!dateString) return '';
+    const filename = `تقرير_البيانات_${new Date().toISOString()}.txt`;
     
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return dateString; // إذا كان التاريخ غير صالح، إرجاع النص كما هو
-    
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    
-    return `${day}-${month}-${year}`;
-}
-
-// إضافة دالة تصدير HTML
-function exportToHTML(data) {
-    const style = `
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                direction: rtl;
-                padding: 20px;
-                background-color: #f5f5f5;
-            }
-            .container {
-                max-width: 1200px;
-                margin: 0 auto;
-                background: white;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            }
-            h1 {
-                text-align: center;
-                color: #2c3e50;
-                margin-bottom: 30px;
-            }
-            .section {
-                margin-bottom: 30px;
-                background: #f8f9fa;
-                padding: 20px;
-                border-radius: 8px;
-            }
-            .section-title {
-                color: #34495e;
-                border-bottom: 2px solid #eee;
-                padding-bottom: 10px;
-                margin-bottom: 20px;
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 20px;
-            }
-            th, td {
-                border: 1px solid #ddd;
-                padding: 12px;
-                text-align: right;
-            }
-            th {
-                background-color: #f4f4f4;
-                font-weight: bold;
-            }
-            tr:nth-child(even) {
-                background-color: #f9f9f9;
-            }
-            .timestamp {
-                text-align: left;
-                color: #666;
-                font-size: 0.9em;
-            }
-        </style>
-    `;
-
-    const html = `<!DOCTYPE html>
-    <html lang="ar" dir="rtl">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>تقرير البيانات</title>
-        ${style}
-    </head>
-    <body>
-        <div class="container">
-            <h1>تقرير البيانات</h1>
-            ${data.map((item, index) => `
-                <div class="section">
-                    <h2 class="section-title">سجل رقم ${index + 1}</h2>
-                    <table>
-                        <tbody>
-                            ${Object.entries(item)
-                                .filter(([key, value]) => value && typeof value === 'string')
-                                .map(([key, value]) => `
-                                    <tr>
-                                        <th>${key}</th>
-                                        <td>${value}</td>
-                                    </tr>
-                                `).join('')}
-                        </tbody>
-                    </table>
-                    <div class="timestamp">
-                        تاريخ التسجيل: ${new Date(item[FIELD_KEYS.TIMESTAMP]).toLocaleString('fr-FR')}
-                    </div>
-                </div>
-            `).join('')}
-        </div>
-    </body>
-    </html>`;
-
-    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `تقرير_البيانات_${new Date().toISOString()}.html`;
-    link.click();
+    if (window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveBlob(blob, filename);
+    } else {
+        const elem = window.document.createElement('a');
+        elem.href = window.URL.createObjectURL(blob);
+        elem.download = filename;
+        document.body.appendChild(elem);
+        elem.click();
+        document.body.removeChild(elem);
+    }
 }
 
 // تصدير إلى HTML
@@ -1373,15 +1275,15 @@ function showDetails(data) {
     // Get the modal element
     const modalElement = document.getElementById('detailsModal');
     
-    // Store the element that had focus before opening the modal
+    // حفظ العنصر الذي كان مركزاً عليه قبل فتح النافذة
     const previousActiveElement = document.activeElement;
     
     // Initialize the modal
     const modal = new bootstrap.Modal(modalElement);
     
-    // Add event listeners for accessibility
+    // حفظ العنصر الذي كان مركزاً عليه قبل فتح النافذة
     modalElement.addEventListener('shown.bs.modal', function () {
-        // Find the first focusable element in the modal
+        // التركيز على زر الإغلاق عند فتح النافذة
         const closeButton = modalElement.querySelector('.btn-close');
         if (closeButton) {
             closeButton.focus();
@@ -1389,9 +1291,7 @@ function showDetails(data) {
     });
 
     modalElement.addEventListener('hidden.bs.modal', function () {
-        // Remove aria-hidden when the modal is closed
-        modalElement.removeAttribute('aria-hidden');
-        // Return focus to the element that had focus before opening the modal
+        // إعادة التركيز إلى العنصر السابق عند إغلاق النافذة
         if (previousActiveElement) {
             previousActiveElement.focus();
         }
