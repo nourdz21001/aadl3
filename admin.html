@@ -272,16 +272,16 @@
     </div>
 
     <!-- Export Modal -->
-    <div class="modal fade" id="exportModal" tabindex="-1">
-        <div class="modal-dialog">
+    <div class="modal fade" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exportModalLabel">
+        <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">تصدير البيانات</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="exportModalLabel">تصدير البيانات</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">تنسيق التصدير</label>
+                        <label for="exportFormat" class="form-label">تنسيق التصدير</label>
                         <select class="form-select" id="exportFormat">
                             <option value="txt">نص TXT</option>
                             <option value="html">HTML</option>
@@ -289,7 +289,7 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">نطاق التصدير</label>
+                        <label for="exportRange" class="form-label">نطاق التصدير</label>
                         <select class="form-select" id="exportRange">
                             <option value="selected">السجلات المحددة فقط</option>
                             <option value="filtered">نتائج البحث الحالية</option>
