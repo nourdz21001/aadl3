@@ -15,11 +15,6 @@ const FIELD_KEYS = {
     NOTES: 'notes'
 };
 
-// بيانات المسؤول
-const ADMIN_CREDENTIALS = {
-    email: 'admin@aadl.dz',
-    password: 'Admin@2024'
-};
 
 // التحقق من وجود حساب المسؤول وإنشائه إذا لم يكن موجوداً
 async function ensureAdminExists() {
@@ -467,7 +462,7 @@ function displayDataAsCards() {
                     <h5 class="card-title">${entry[FIELD_KEYS.NAME_AR]}</h5>
                     <p class="card-text">${entry[FIELD_KEYS.PHONE]}</p>
                     <p class="card-text"><small class="text-muted">
-                        ${new Date(entry[FIELD_KEYS.TIMESTAMP]).toLocaleString('ar-SA')}
+                        ${new Date(entry[FIELD_KEYS.TIMESTAMP]).toLocaleString('fr-FR')}
                     </small></p>
                 </div>
                 <div class="card-footer">
@@ -1129,7 +1124,7 @@ function formatTimestamp(timestamp) {
             hour12: true
         };
 
-        return new Intl.DateTimeFormat('ar-SA', options).format(date);
+        return new Intl.DateTimeFormat('fr-FR', options).format(date);
     } catch (error) {
         console.error('خطأ في تنسيق التاريخ:', error);
         return 'خطأ في التاريخ';
@@ -1653,7 +1648,7 @@ function updateStats() {
         }, null);
         
         lastUpdateElement.textContent = latestRecord 
-            ? new Date(latestRecord.timestamp).toLocaleString('ar-SA')
+            ? new Date(latestRecord.timestamp).toLocaleString('fr-FR')
             : '-';
     }
 }
