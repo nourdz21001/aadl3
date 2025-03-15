@@ -1385,17 +1385,18 @@ function showDetails(data) {
                             <div>${data.nss_conjoint || '-'}</div>
                         </div>
                         <div class="col-md-6 mb-2">
-                            <strong>مهنة الزوج/ة:</strong>
-                            <div>${data.spouseProfession || '-'}</div>
+                            <strong>تاريخ ميلاد الزوج/ة:</strong>
+                            <div>${formatDate(data.date_nais_conjoint) || '-'}</div>
                         </div>
                         <div class="col-md-6 mb-2">
-                            <strong>راتب الزوج/ة:</strong>
-                            <div>${data.spouseSalary || '0'} دج</div>
+                            <strong>لقب الزوج/ة:</strong>
+                            <div>${data.nom_conjoint || '-'}</div>
                         </div>
-                        <div class="col-md-12 mb-2">
-                            <strong>مكان عمل الزوج/ة:</strong>
-                            <div>${data.spouseEmployer || '-'}</div>
+                        <div class="col-md-6 mb-2">
+                            <strong>إسم الزوج/ة:</strong>
+                            <div>${data.prenom_conjoint || '-'}</div>
                         </div>
+                        <!-- ... rest of spouse details ... -->
                     </div>
                 </div>
             ` : ''}
