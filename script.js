@@ -152,19 +152,24 @@ Prénom de la mère : ${data.motherNameFr}
 
 function generateSpouseInfo(data) {
     return `
-إسم أب الزوج/ة : ${data.spouseFatherNameAr}
-Prénom du père du conjoint : ${data.spouseFatherNameFr}
-لقب أم الزوج/ة : ${data.spouseMotherLastNameAr}
-Nom de la mère du conjoint : ${data.spouseMotherLastNameFr}
-إسم أم الزوج/ة : ${data.spouseMotherNameAr}
-Prénom de la mère du conjoint : ${data.spouseMotherNameFr}
-تاريخ ميلاد أب الزوج/ة( Date de naissance du père du conjoint) : ${data.spouseFatherBirthDate}
-تاريخ ميلاد أم الزوج/ة( Date de naissance de la mère du conjoint ) : ${data.spouseMotherBirthDate}
-مكان ميلاد أب الزوج/ة ( Lieux de naissance du père du conjoint ) : ${data.spouseFatherBirthPlace}
-مكان ميلاد أم الزوج/ة( Lieux de naissance de la mère du conjoint ) : ${data.spouseMotherBirthPlace}
-مهنة الزوج/ة ( Profession du Conjoint ) : ${data.spouseProfession}
-الراتب للزوج(ة) ( لشهر جوان 2024 ) - Salaire Conjoint ( du mois de Juin 2024 ) : ${data.spouseSalary}
-مكان العمل للزوج(ة) - Employeur Conjoint : ${data.spouseEmployer}`;
+الرقم التعريفي الوطني الوحيد للزوج(ة) ( NIN Conjoint ) : ${data.nin_conjoint || ''}
+رقم الضمان الإجتماعي للزوج(ة) ( NSS Conjoint ) : ${data.nss_conjoint || ''}
+تاريخ ميلاد الزوج/ة ( Date de naissance Conjoint ) : ${data.date_nais_conjoint || ''}
+لقب الزوج/ة ( Nom du conjoint ) : ${data.nom_conjoint || ''}
+إسم الزوج/ة ( Prénom du conjoint ) : ${data.prenom_conjoint || ''}
+إسم أب الزوج/ة : ${data.spouseFatherNameAr || ''}
+Prénom du père du conjoint : ${data.spouseFatherNameFr || ''}
+لقب أم الزوج/ة : ${data.spouseMotherLastNameAr || ''}
+Nom de la mère du conjoint : ${data.spouseMotherLastNameFr || ''}
+إسم أم الزوج/ة : ${data.spouseMotherNameAr || ''}
+Prénom de la mère du conjoint : ${data.spouseMotherNameFr || ''}
+تاريخ ميلاد أب الزوج/ة( Date de naissance du père du conjoint) : ${data.spouseFatherBirthDate || ''}
+تاريخ ميلاد أم الزوج/ة( Date de naissance de la mère du conjoint ) : ${data.spouseMotherBirthDate || ''}
+مكان ميلاد أب الزوج/ة ( Lieux de naissance du père du conjoint ) : ${data.spouseFatherBirthPlace || ''}
+مكان ميلاد أم الزوج/ة( Lieux de naissance de la mère du conjoint ) : ${data.spouseMotherBirthPlace || ''}
+مهنة الزوج/ة ( Profession du Conjoint ) : ${data.spouseProfession || ''}
+الراتب للزوج(ة) ( لشهر جوان 2024 ) - Salaire Conjoint ( du mois de Juin 2024 ) : ${data.spouseSalary || '0'}
+مكان العمل للزوج(ة) - Employeur Conjoint : ${data.spouseEmployer || ''}`;
 }
 
 // Setup input validation
