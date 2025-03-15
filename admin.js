@@ -94,77 +94,25 @@ async function handleLogin(e) {
         const email = document.getElementById('adminEmail').value;
         const password = document.getElementById('adminPassword').value;
 
-        console.log('محاولة تسجيل الدخول باستخدام:', email);
-
         // تسجيل الدخول باستخدام Firebase Auth
         const userCredential = await auth.signInWithEmailAndPassword(email, password);
         const user = userCredential.user;
 
-        console.log('تم تسجيل الدخول بنجاح:', user.email);
-
-        // إذا كان البريد الإلكتروني هو بريد المسؤول
-        if (email === ADMIN_CREDENTIALS.email) {
-            try {
-                // التحقق من وجود وثيقة المستخدم في Firestore
-                const userDoc = await db.collection('users').doc(user.uid).get();
-                
-                if (!userDoc.exists) {
-                    console.log('إنشاء وثيقة المسؤول في Firestore...');
-                    // إنشاء وثيقة المستخدم في Firestore
-                    await db.collection('users').doc(user.uid).set({
-                        email: user.email,
-                        role: 'admin',
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                } else {
-                    console.log('تحديث وقت آخر تسجيل دخول للمسؤول...');
-                    // تحديث وقت آخر تسجيل دخول
-                    await db.collection('users').doc(user.uid).update({
-                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                }
-
-                // تخزين حالة تسجيل الدخول
-                sessionStorage.setItem('adminLoggedIn', 'true');
-                location.reload();
-                return;
-            } catch (firestoreError) {
-                console.error('خطأ في التعامل مع Firestore:', firestoreError);
-                throw new Error('حدث خطأ أثناء معالجة بيانات المستخدم');
-            }
-        }
-
-        // للمستخدمين الآخرين، التحقق من دورهم
-        try {
-            const userDoc = await db.collection('users').doc(user.uid).get();
-            
-            if (!userDoc.exists) {
-                console.log('لم يتم العثور على وثيقة المستخدم في Firestore');
-                await auth.signOut();
-                throw new Error('لم يتم العثور على بيانات المستخدم في Firestore');
-            }
-
-            const userData = userDoc.data();
-            if (userData.role !== 'admin') {
-                console.log('المستخدم ليس لديه صلاحيات المسؤول');
-                await auth.signOut();
-                throw new Error('ليس لديك صلاحية الوصول إلى لوحة التحكم');
-            }
-
-            // تحديث آخر تسجيل دخول
-            await db.collection('users').doc(user.uid).update({
-                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-            });
-
-            sessionStorage.setItem('adminLoggedIn', 'true');
-            location.reload();
-
-        } catch (firestoreError) {
-            console.error('خطأ في التحقق من صلاحيات المستخدم:', firestoreError);
+        // التحقق من دور المستخدم في Firestore
+        const userDoc = await db.collection('users').doc(user.uid).get();
+        
+        if (!userDoc.exists || userDoc.data().role !== 'admin') {
             await auth.signOut();
-            throw new Error('حدث خطأ في التحقق من صلاحيات المستخدم');
+            throw new Error('ليس لديك صلاحية الوصول إلى لوحة التحكم');
         }
+
+        // تحديث آخر تسجيل دخول
+        await db.collection('users').doc(user.uid).update({
+            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        sessionStorage.setItem('adminLoggedIn', 'true');
+        location.reload();
 
     } catch (error) {
         console.error('خطأ في تسجيل الدخول:', error);
@@ -196,15 +144,10 @@ async function handleLogin(e) {
 }
 
 // تحديث دالة التهيئة
-document.addEventListener('DOMContentLoaded', async function() {
-    console.log('بدء تهيئة التطبيق...');
-    await ensureAdminExists();
-    
+document.addEventListener('DOMContentLoaded', function() {
     if (!isLoggedIn()) {
-        console.log('المستخدم غير مسجل الدخول، عرض نموذج تسجيل الدخول');
         showLoginForm();
     } else {
-        console.log('المستخدم مسجل الدخول، تهيئة لوحة التحكم');
         initializeAdminPanel();
     }
 });
