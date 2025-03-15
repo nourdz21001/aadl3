@@ -144,6 +144,32 @@
                 <h3 class="mt-4 mb-3">معلومات الزوج/ة</h3>
                 <div class="row">
                     <div class="col-12 mb-3">
+                        <label for="date_nais_conjoint" class="form-label">تاريخ ميلاد الزوج/ة ( Date de naissance Conjoint )*</label>
+                        <input type="date" class="form-control form-control-lg rounded-pill" name="date_nais_conjoint" id="date_nais_conjoint" required>
+                        <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label for="nom_conjoint" class="form-label">لقب الزوج/ة ( Nom du conjoint )*</label>
+                        <input type="text" class="form-control form-control-lg rounded-pill" name="nom_conjoint" id="nom_conjoint" 
+                            placeholder="ادخل لقب الزوج/ة هنا ( Entrez le nom de votre conjoint )"
+                            pattern="^[^'<>;\/\\\|\*&=]+$" 
+                            title="Caractères interdits : ', &quot;, <, >, ;, /, \, |, *, =, &" 
+                            required>
+                        <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label for="prenom_conjoint" class="form-label">إسم الزوج/ة ( Prénom du conjoint )*</label>
+                        <input type="text" class="form-control form-control-lg rounded-pill" name="prenom_conjoint" id="prenom_conjoint" 
+                            placeholder="ادخل إسم الزوج/ة هنا ( Entrez le Prénom de votre conjoint )"
+                            pattern="^[^'<>;\/\\\|\*&=]+$" 
+                            title="Caractères interdits : ', &quot;, <, >, ;, /, \, |, *, =, &" 
+                            required>
+                        <div class="invalid-feedback">هذا الحقل مطلوب</div>
+                    </div>
+
+                    <div class="col-12 mb-3">
                         <label for="spouseFatherNameAr" class="form-label">إسم أب الزوج/ة*</label>
                         <input type="text" class="form-control" id="spouseFatherNameAr" name="spouseFatherNameAr">
                         <div class="invalid-feedback">هذا الحقل مطلوب</div>
