@@ -14,6 +14,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Setup input validation
     setupInputValidation();
+
+    const familyStatusInputs = document.querySelectorAll('input[name="situation_familiale[]"], input[name="flag_celebataire"], input[name="flag_divorce"]');
+    
+    familyStatusInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            // إلغاء تحديد الخيارات الأخرى
+            familyStatusInputs.forEach(otherInput => {
+                if (otherInput !== this) {
+                    otherInput.checked = false;
+                }
+            });
+
+            // إظهار/إخفاء قسم معلومات الزوج/ة
+            const showSpouseSection = this.value === 'marie' || this.value === 'veuf';
+            spouseSection.style.display = showSpouseSection ? 'block' : 'none';
+
+            // تحديث حالة الحقول المطلوبة
+            const spouseInputs = spouseSection.querySelectorAll('input');
+            spouseInputs.forEach(input => {
+                input.required = showSpouseSection;
+            });
+        });
+    });
 });
 
 // Handle marital status changes
@@ -174,17 +197,8 @@ Prénom de la mère du conjoint : ${data.spouseMotherNameFr || ''}
 
 // Setup input validation
 function setupInputValidation() {
-    // Phone number validation
-    const phoneInput = document.querySelector('input[name="phone"]');
-    if (phoneInput) {
-        phoneInput.addEventListener('input', function() {
-            this.value = this.value.replace(/[^0-9+]/g, '');
-            validatePhoneNumber(this);
-        });
-    }
-
-    // NIN validation
-    const ninInput = document.querySelector('input[name="nin"]');
+    // التحقق من NIN
+    const ninInput = document.querySelector('input[name="nim"]');
     if (ninInput) {
         ninInput.addEventListener('input', function() {
             this.value = this.value.replace(/[^0-9]/g, '');
@@ -192,49 +206,73 @@ function setupInputValidation() {
         });
     }
 
-    // NSS validation
-    const nssInput = document.querySelector('input[name="nss"]');
-    if (nssInput) {
-        nssInput.addEventListener('input', function() {
-            this.value = this.value.replace(/[^0-9]/g, '');
+    // التحقق من NSS
+    const nssInputs = document.querySelectorAll('input[name="nss"], input[name="nss_conjoint"]');
+    nssInputs.forEach(input => {
+        input.addEventListener('input', function() {
             validateNSS(this);
+        });
+    });
+
+    // التحقق من رقم الهاتف
+    const phoneInput = document.querySelector('input[name="numero_tlf"]');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            validatePhoneNumber(this);
         });
     }
 
-    // Salary validation
-    const salaryInputs = document.querySelectorAll('input[type="number"]');
+    // التحقق من الرواتب
+    const salaryInputs = document.querySelectorAll('input[name="salaire"], input[name="salaire_conjoint"]');
     salaryInputs.forEach(input => {
         input.addEventListener('input', function() {
             validateSalary(this);
         });
     });
+
+    // التحقق من التواريخ
+    const dateInputs = document.querySelectorAll('input[type="date"]');
+    dateInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            validateDate(this);
+        });
+    });
 }
 
-// Validation functions
-function validatePhoneNumber(input) {
-    const value = input.value.trim();
-    const isValid = /^[0-9+]{8,}$/.test(value);
-    updateValidationUI(input, isValid, 'رقم الهاتف يجب أن يحتوي على 8 أرقام على الأقل');
-}
-
+// وظائف التحقق المحدثة
 function validateNIN(input) {
     const value = input.value.trim();
-    const isValid = /^[0-9]{8,}$/.test(value);
-    updateValidationUI(input, isValid, 'الرقم التعريفي يجب أن يحتوي على 8 أرقام على الأقل');
+    const isValid = /^[1-9][0-9]{17}$/.test(value);
+    updateValidationUI(input, isValid, 'يجب أن يحتوي الرقم التعريفي على 18 رقماً بالضبط ولا يمكن أن يبدأ بـ 0');
 }
 
 function validateNSS(input) {
     const value = input.value.trim();
-    const isValid = /^[0-9]{8,}$/.test(value);
-    updateValidationUI(input, isValid, 'رقم الضمان الاجتماعي يجب أن يحتوي على 8 أرقام على الأقل');
+    const isValid = /^[a-zA-Z0-9]{4,13}$/.test(value);
+    updateValidationUI(input, isValid, 'يجب أن يحتوي رقم الضمان الإجتماعي على 4 إلى 13 حرفاً أو رقماً فقط');
+}
+
+function validatePhoneNumber(input) {
+    const value = input.value.trim();
+    const isValid = /^\d{10}$/.test(value);
+    updateValidationUI(input, isValid, 'يجب أن يتكون رقم الهاتف من 10 أرقام بالضبط');
 }
 
 function validateSalary(input) {
-    const value = parseFloat(input.value);
-    const isValid = !isNaN(value) && value >= 0;
-    if (!isValid) {
-        input.value = 0;
-    }
+    const value = input.value.trim();
+    const isValid = /^\d{1,6}([.]\d{1,2})?$/.test(value);
+    updateValidationUI(input, isValid, 'يجب إدخال قيمة صحيحة للراتب');
+}
+
+function validateDate(input) {
+    const value = input.value;
+    const date = new Date(value);
+    const minDate = new Date('1910-01-01');
+    const maxDate = new Date('1988-12-31');
+    
+    const isValid = date >= minDate && date <= maxDate;
+    updateValidationUI(input, isValid, 'يجب أن يكون التاريخ بين 1910 و 1988');
 }
 
 function updateValidationUI(input, isValid, errorMessage) {
